@@ -36,34 +36,34 @@ def takeHigher($set;$colour):
 
 # ------------------------
 
-# The main constraints 
-12 as $RED | 13 as $GREEN | 14 as $BLUE
+# Code common to both parts
+def core:
 
-# Start processing the game records
-| records
+    # Start processing the game records
+    records
 
 # For each game
-| map(
-    # split off the game number from the game's set list
-    split(":")
-    # and separate out that set list (.[1]) (they're joined by semicolons)
-    # into individual sets
-    | .[1] | split(";")
-)
+    | map(
+        # split off the game number from the game's set list
+        split(":")
+        # and separate out that set list (.[1]) (they're joined by semicolons)
+        # into individual sets
+        | .[1] | split(";")
+    )
 
 # Then take each set list
-| map(
+    | map(
 
-    # produce a workable game set structure
-    gameSets
+        # produce a workable game set structure
+        gameSets
 
-    # and then work out the highest number of each cube colour
-    | reduce .[] as $set ({}; {
-        red: takeHigher($set; "red"),
-        green: takeHigher($set; "green"),
-        blue: takeHigher($set; "blue")
-    })
-)
+        # and then work out the highest number of each cube colour
+        | reduce .[] as $set ({}; {
+            red: takeHigher($set; "red"),
+            green: takeHigher($set; "green"),
+            blue: takeHigher($set; "blue")
+        })
+    )
 
 # This produces (for the part 1 sample data) something like this:
 # [
@@ -94,17 +94,32 @@ def takeHigher($set;$colour):
 #   }
 # ]
 
-# Use to_entries to capture the game number and increment the key value to
-# represent the game number
-| to_entries
-| map(.key += 1)
+;
 
-# Now filter out any games where the sets cannot have been possible
-| map(select(
+# The main constraints 
+12 as $RED | 13 as $GREEN | 14 as $BLUE
 
-    .value.red <= $RED and .value.green <= $GREEN and .value.blue <= $BLUE
+| core
 
-))
+| if part == "1" then 
 
-# The result should be the sum of the IDs of the games that are possible
-| map(.key) | add
+    # Use to_entries to capture the game number in the form of the value
+    # of the key property, plus 1
+    to_entries | map(.key += 1)
+
+    # Now filter out any games where the sets cannot have been possible
+    | map(select(
+        .value.red <= $RED and .value.green <= $GREEN and .value.blue <= $BLUE
+    ))
+
+    # The result should be the sum of the IDs of the games that are possible
+    | map(.key) | add
+
+else
+
+    # We already have the "fewest number of cubes of each colour [required]" so
+    # just calculate the power by reducing over each game object's values and
+    # adding them together.
+    map(reduce .[] as $x (1; . * $x)) | add
+
+end 
