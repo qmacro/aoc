@@ -13,7 +13,15 @@ def reverseString: split("") | reverse | join("");
 
 # SOLUTION-SPECIFIC FUNCTIONS
 
-# Return set info for a game, structured like this
+# Return set info for a game, turning this:
+# [
+#   " 3 blue, 4 red",
+#   " 1 red, 2 green, 6 blue",
+#   " 2 green"
+# ]
+# 
+# into this:
+
 # [
 #   { "blue": "3", "red": "4" },
 #   { "red": "1", "green": "2", "blue": "6" },
@@ -28,7 +36,7 @@ records
     split(":")
     | .[1] | split(";")
 )
-| map(gameSets)
+| first
 
 
 
