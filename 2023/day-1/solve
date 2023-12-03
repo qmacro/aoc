@@ -2,5 +2,5 @@
 
 declare part="${1:-1}"
 declare data="${2:-test}"
-declare invocation="echo Part ${part^^} \($data\); ./solution $part-$data.dat"
+declare invocation="echo Part ${part^^} \($data\); ./solution.jq $part-$data.dat"
 ls * | entr -c bash -c "$invocation"
