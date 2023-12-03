@@ -6,4 +6,4 @@ declare day="${3:-$(printf "%d" $(date +%d))}"
 
 declare invocation="echo Part $part \($data\) on Day $day; cd day-${day} && ./solution.jq $part-$data.dat"
 
-ls * | entr -c bash -c "$invocation"
+find day-${day}* | entr -c bash -c "$invocation"
