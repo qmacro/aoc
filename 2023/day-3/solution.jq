@@ -36,11 +36,20 @@ def findSymbolCoordsInRow:
     | map([$row, .offset])
 ;
 
+def findPartNumbersInRow:
+    .key as $row
+    | .value
+    | [match("[\\d]+";"g")]
+    | map({row: $row, col: .offset, len: .length, num: .string | tonumber})
+;
+
 
 if part == "1" then
 
     records
-    | ( to_entries | map(findSymbolCoordsInRow) | add) as $coords
+    | to_entries
+    | ( map(findSymbolCoordsInRow) | add) as $symbolcoords
+    | ( map(findPartNumbersInRow) | add) as $partnumbers
     | .
 
 else
