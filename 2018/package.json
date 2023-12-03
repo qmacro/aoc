@@ -1,0 +1,23 @@
+{
+  "name": "adventofcode2018",
+  "version": "1.0.0",
+  "description": "Advent of Code 2018 - JavaScript",
+  "main": "index.js",
+  "scripts": {
+    "test": "jasmine"
+  },
+  "author": "DJ Adams",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^2.3.0"
+  },
+  "devDependencies": {
+    "eslint": "^4.12.1",
+    "jasmine": "^2.8.0",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-node": "^5.2.1",
+    "eslint-plugin-promise": "^3.6.0",
+    "eslint-plugin-standard": "^3.0.1"
+  }
+}

@@ -1,0 +1,1 @@
+Using Ramda flavoured JavaScript.
