@@ -40,9 +40,8 @@ def findSymbolCoordsInRow:
 if part == "1" then
 
     records
-    | to_entries
-    | map(findSymbolCoordsInRow)
-    | add
+    | ( to_entries | map(findSymbolCoordsInRow) | add) as $coords
+    | .
 
 else
 
