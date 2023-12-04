@@ -36,6 +36,8 @@ def findSymbolCoordsInRow:
     | map([$row, .offset])
 ;
 
+# Produce an array of objects representing part numbers, each with
+# row, column, length and actual value information.
 def findPartNumbersInRow:
     .key as $row
     | .value
@@ -43,14 +45,43 @@ def findPartNumbersInRow:
     | map({row: $row, col: .offset, len: .length, num: .string | tonumber})
 ;
 
+# Given a part number object (as produced by findPartNumbersInRow), calculate
+# generously all the cells around it, i.e. every single cell marked X in this
+# example for the part number 42 (actually the row/col coords for 4 and 2 are
+# also included, as are any "out of bounds cells on rows or columns that are 
+# just outside the bounds of the schematic, this is to keep things simple):
+# ..XXXX.....
+# ..X42X.....
+# ..XXXX.....
+def calcAdjacentCells:
+    . as $p
+    | map(range($p.row - 1; $p.row + 2) | reduce . as $r ([]; 
+        . + [range($p.col - 1; $p.col + $p.len + 1) | reduce . as $c ([]; 
+        . + [$r, $c]
+        )]
+    )) | add
+;
+
+# Given a part number object, work out whether it has a symbol adjacent to it.
+# Do this by comparing the array of all the adjacent cells with the array of
+# all the symbol cells. The (amazing) magic of jq's array subtraction gives us
+# the 'remainder' and if the length of that remainder is not the original length
+# of the symbol cells array, we know there's a match i.e. at least one symbol
+# cell that's adjacent. 
+def hasAdjacentSymbol($s):
+    ($s | length) as $totalSymbols
+    | ($s - calcAdjacentCells | length) as $remainingSymbols
+    | $totalSymbols != $remainingSymbols
+;
 
 if part == "1" then
 
     records
     | to_entries
-    | ( map(findSymbolCoordsInRow) | add) as $symbolcoords
-    | ( map(findPartNumbersInRow) | add) as $partnumbers
-    | .
+    | ( map(findSymbolCoordsInRow) | add) as $symbolCoords
+
+    | map(findPartNumbersInRow) | add
+    | map(select(hasAdjacentSymbol($symbolCoords)).num) | add
 
 else
 
