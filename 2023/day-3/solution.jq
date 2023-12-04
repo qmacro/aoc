@@ -26,13 +26,13 @@ def reverseString: split("") | reverse | join("");
 # 467..114..
 # ...*...... <--
 # ..35..633.
-# then return a list of coordinates for any symbols
+# then return a list of coordinates for symbols (according to the RE)
 # found on that row. For the above indicated row, this function
 # would return [[1,3]] (for the * symbol).
-def findSymbolCoordsInRow:
+def findSymbolCoordsInRow($symbolRegexp):
     .key as $row
     | .value
-    | [match("[^\\.\\d]";"g")]
+    | [match($symbolRegexp;"g")]
     | map([$row, .offset])
 ;
 
@@ -78,7 +78,7 @@ if part == "1" then
 
     records
     | to_entries
-    | ( map(findSymbolCoordsInRow) | add) as $symbolCoords
+    | ( map(findSymbolCoordsInRow("[^\\.\\d]")) | add) as $symbolCoords
 
     | map(findPartNumbersInRow) | add
     | map(select(hasAdjacentSymbol($symbolCoords)).num) | add
