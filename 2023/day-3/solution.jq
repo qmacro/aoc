@@ -55,11 +55,11 @@ def findPartNumbersInRow:
 # ..XXXX.....
 def calcAdjacentCells:
     . as $p
-    | map(range($p.row - 1; $p.row + 2) | reduce . as $r ([]; 
+    | [range($p.row - 1; $p.row + 2) | reduce . as $r ([]; 
         . + [range($p.col - 1; $p.col + $p.len + 1) | reduce . as $c ([]; 
         . + [$r, $c]
         )]
-    )) | add
+    )] | add
 ;
 
 # Given a part number object, work out whether it has a symbol adjacent to it.
