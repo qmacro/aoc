@@ -74,6 +74,14 @@ def hasAdjacentSymbol($s):
     | $totalSymbols != $remainingSymbols
 ;
 
+def isPartAdjacent($p;$g):
+
+    #. as $gearCoords
+    ($p | calcAdjacentCells) as $cells
+    | $cells - [$g] | length < ($cells | length)
+
+;
+
 if part == "1" then
 
     records
@@ -85,6 +93,31 @@ if part == "1" then
 
 else
 
-    null
+    records
+    | to_entries
+    | (map(findPartNumbersInRow) | add) as $partNumbers
+    | (map(findSymbolCoordsInRow("\\*")) | add) as $gearCoords
+    | $gearCoords
+
+    # Look through each of the gears
+    | map(
+        . as $gearCoord
+
+        # and for each of these gear's coordinates, check the part numbers
+        | $partNumbers
+
+        # to see which ones are adjacent to the gear
+        | map(select(isPartAdjacent(.;$gearCoord)))
+
+        # we're only interested in gears with exactly two adjacent parts
+        | select(length == 2)
+
+        # multiply the numbers of each pair of adjacent parts
+        | map(.num) | reduce .[] as $partnumber (1; . * $partnumber)
+
+    ) 
+
+    # Finally, add the part pair number products together
+    | add
 
 end
