@@ -39,16 +39,47 @@ def parseCard:
 
 ;
 
+def countWinningNumbers:
+    (.have | length) - ((.have - .winning) | length)
+;
+
+
 records
 
 # Parse each card
 | map(parseCard)
 
-# Then take each card and work out how many winning numbers there are
-| map((.have | length) - ((.have - .winning) | length))
+| if part == "1" then
 
-# For those that have any (> 0) winning numbers, calculate the points
-| map(select(. > 0) | pow(2;.-1))
+    # Then take each card and work out how many winning numbers there are
+    map(countWinningNumbers)
 
-# And sum the points for the answer
-| add
+    # For those that have any (> 0) winning numbers, calculate the points
+    # And sum the points for the answer
+    | map(select(. > 0) | pow(2;.-1)) | add
+
+else
+    
+    # Horribly inefficient but I don't care, I created a generator. Go me!
+
+    # Generate streams of cards recursively, because streams and recursion.
+    # And generators.
+    def copies($wn):
+        map(
+            ., ([range(. + 1; . + $wn[.] + 1)] | copies($wn))
+        )
+    ;
+
+    # Create an array of winning numbers, where the array index is the card number
+    (reduce .[] as $card ([0]; . + [$card | countWinningNumbers])) as $winningNumbers
+
+    # Go through the cards, and generate all copies (passing the winning numbers
+    # array for reference).
+    | map(.card) | copies($winningNumbers)
+
+    # Flatten the recursively generated stream of card values, arrange by card number
+    # and then count up how many of each, totalling at the end.
+    | flatten | group_by(.) | map(length) | add
+
+end
+
