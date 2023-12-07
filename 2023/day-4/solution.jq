@@ -39,6 +39,8 @@ def parseCard:
 
 ;
 
+# Takes a card object (as produced by parseCard) and calculates how many winning
+# numbers it has, by subtracting the 'winning' from the 'have' array, and counting.
 def countWinningNumbers:
     (.have | length) - ((.have - .winning) | length)
 ;
