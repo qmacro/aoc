@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-declare part="${1:-1}"
-declare data="${2:-test}"
-declare day="${3:-$(printf "%d" $(date +%d))}"
+declare day="${1:?Specify Day}"
+declare part="${2:-1}"
+declare data="${3:-test}"
 
-declare invocation="echo Part $part \($data\) on Day $day; cd day-${day} && ./solution.jq $part-$data.dat"
+declare invocation="echo Day $day Part $part \($data\); cd day-${day} && ./solution.jq $part-$data.dat"
 
 find day-${day}* | entr -c bash -c "$invocation"
