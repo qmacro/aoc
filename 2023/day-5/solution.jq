@@ -24,6 +24,13 @@ def lookup($maps; $value; $stage):
     )
 ;
 
+def determineAllSeeds:
+    
+    #[_nwise(2) | range(first;first+.[1])]
+    [range(first;first+.[1])]
+
+;
+
 def main:
 
     # Split up into seeds and maps
@@ -37,16 +44,19 @@ def main:
     # Work out the process flow, i.e. "soil" -> "fertilizer" -> "..." etc.
     | ($maps | keys_unsorted) as $process
 
-    # Work out the final values for each of the seeds by sending each through
-    # the entire process flow.
-    | $seeds
-    | map(
-        . as $seed 
-        | $process | reduce .[] as $stage ($seed; lookup($maps; .; $stage))
-    )
+    # In part 2, the seeds are determined from ranges rather than simple values
+    | if lib::part == "1" then $seeds else ($seeds | determineAllSeeds) end
+    | length
 
-    # The lowest final value is the answer to part 1.
-    | min
+    # Work out the final values for each of the seeds by sending each through
+    # the entire process flow. 
+#    | map(
+#        . as $seed 
+#        | $process | reduce .[] as $stage ($seed; lookup($maps; .; $stage))
+#    )
+#
+#    # The lowest final value is the answer to part 1.
+#    | min
 
 ;
 
