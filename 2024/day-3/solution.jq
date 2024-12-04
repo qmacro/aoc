@@ -10,9 +10,10 @@ def records: split("\n")[:-1];
 
 # SOLUTION-SPECIFIC FUNCTIONS
 
-#def instructions: [match("(mul\\((\\d{1,3}),(\\d{1,3})\\)|do\\(\\)|don't\\(\\))";"g")];
-def instructions: [match("mul\\((\\d{1,3}),(\\d{1,3})\\)";"g")];
+
+def instructions: [match("(don't\\(\\)|do\\(\\)|mul\\((?<x>\\d{1,3}),(?<y>\\d{1,3})\\))";"g")];
 def onlymul: select(.string | startswith("mul"));
+
 
 if $part == "1" then
 
@@ -20,7 +21,7 @@ if $part == "1" then
   | map(
     onlymul
     | .captures
-    | map(.string|tonumber)
+    | map(select(.name == "x" or .name == "y") | .string | tonumber)
     | mul
   )
   | add
