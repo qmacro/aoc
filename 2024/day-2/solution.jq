@@ -40,8 +40,7 @@ else
   map(
     report
     | dampen
-    | map(movements)
-    | map(safe)
+    | map(movements | safe)
     | select(any)
   )
   | length
