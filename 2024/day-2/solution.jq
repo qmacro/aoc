@@ -19,21 +19,31 @@ def aperture(n):
 def report: split("\\s+";null) | map(tonumber);
 def allincdec: all(. >= 0) or all(. <= 0);
 def diffinrange(a;b): all(.|abs >= a) and all(.|abs <= b);
+def movements: aperture(2) | map(diff);
+def safe: allincdec and diffinrange(1;3);
+def removeitem(n): to_entries|map(select(.key != n)|.value);
+def dampen: . as $l | reduce range($l|length) as $i ([$l];. + [$l | removeitem($i)]);
 
 records
 
 | if $part == "1" then
 
   map(
-    report                                    # produce report (list of nrs)
-    | aperture(2)                             # classic fn
-    | map(diff)                               # calc diffs between adjacents
-    | select(allincdec and diffinrange(1;3))  # filter out
+    report
+    | movements
+    | select(safe)
   ) 
-  | length                                    # how many reports meet criteria
+  | length
 
 else 
 
-  "Not implemented yet"
+  map(
+    report
+    | dampen
+    | map(movements)
+    | map(safe)
+    | select(any)
+  )
+  | length
 
 end
