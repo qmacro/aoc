@@ -10,13 +10,16 @@ def records: split("\n")[:-1];
 
 # SOLUTION-SPECIFIC FUNCTIONS
 
+#def instructions: [match("(mul\\((\\d{1,3}),(\\d{1,3})\\)|do\\(\\)|don't\\(\\))";"g")];
 def instructions: [match("mul\\((\\d{1,3}),(\\d{1,3})\\)";"g")];
+def onlymul: select(.string | startswith("mul"));
 
 if $part == "1" then
 
   instructions
   | map(
-    .captures
+    onlymul
+    | .captures
     | map(.string|tonumber)
     | mul
   )
@@ -25,6 +28,6 @@ if $part == "1" then
 
 else 
 
-  "Not implemented yet"
+  instructions
 
 end
