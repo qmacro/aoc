@@ -25,33 +25,75 @@ def followsAllRules(rules):
   | rules | any(select(. == $pair))
 ;
 
-def middleNumber:
-  split(",")
-  | map(tonumber)
-  | .[length/2]
+def x(rules):
+  . as $pair
+  | rules | map(select(. == $pair))
 ;
+
+def numbers: split(",") | map(tonumber);
+
+def middleNumber: numbers | .[length/2];
+
+def patternPairs(x):
+  to_entries |
+  [
+    (map(select(.key == x))|first.value), 
+    "(\(map(select(.key != x).value)|join("|")))"
+  ]
+;
+
+def patternLeft(x): patternPairs(x) | join("\\|"); 
+def patternRight(x): patternPairs(x) | reverse | join("\\|"); 
+
+
+
+def z(patterns; rules):
+
+  patterns | map(. as $pattern | rules | map(select(test($pattern))))
+
+;
+  
 
 records
 
-| if $part == "1" then
-
-  [
+| [
     map(select(test("\\|"))),
     map(select(test(",")))
   ] as [$rules, $updates]
 
   | $updates
 
-    # do all the pairs in the update follow all the rules?
-  | map(select(pairs|map(followsAllRules($rules))|all))
+  | if $part == "1" then
 
-    # if so, take the middle numbers and add them
-  | map(middleNumber)
-  | add
+      # do all the pairs in the update follow all the rules?
+    map(select(pairs|map(followsAllRules($rules))|all))
+
+      # if so, take the middle numbers and add them
+    | map(middleNumber)
+    | add
   
 
-else 
+  else 
 
-  "Not implemented yet"
+    map(
 
-end
+      # Pick out the ones that fail the rules
+      select(pairs|map(followsAllRules($rules))|all|not)
+
+      # Ug. Ly. Don't look.
+      | numbers
+      | [., length] as [$xs, $l]
+      | [range($l)]
+      | map(. as $x | $xs | [patternLeft($x), patternRight($x)])
+      | map(z(.;$rules))
+      | map(select((first|length) == (second|length)))
+      | map(first|first)
+      | map(sub("\\|.+";"")|tonumber)
+      | add
+
+    )
+
+    | add
+
+
+  end
