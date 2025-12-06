@@ -1,0 +1,22 @@
+{
+  "name": "Advent Of Code 2025",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "advent of code",
+    "puzzle"
+  ],
+  "author": "DJ Adams",
+  "license": "MIT",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.39.1",
+    "eslint": "^9.39.1",
+    "globals": "^16.5.0"
+  }
+}
